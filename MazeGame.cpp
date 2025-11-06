@@ -140,7 +140,7 @@ void PrintMaze(int maze[LY][LX], int sizeX, int sizeY)
 }
 
 
-void endGame()
+void errorGame()
 {
     setlocale(LC_ALL, "ru-RU");
     cout << "Игра завершается в связи с инвалидностью лабиринта" << endl;
@@ -200,118 +200,32 @@ void ShowPlayer()
     cout << player; // и печатаем образ игрока
 }
 
-// Функция перемещает игрока вверх на одну клетку, если это разрешено
-void GoUp()
+void MovePlayer(int dx, int dy)
 {
-    if (hy > 0) // проверяем, если текущая позиция игрока > 0 - то перемещаться можно
+    if (hx + dx < LX && hy + dy < LY && hx + dx >= 0 && hy + dy >= 0) // проверяем, если текущая позиция игрока > 0 - то перемещаться можно
     {
-        switch (maze[hy - 1][hx]) // проверяем, что находится в ячейке матрицы на строку выше
+        switch (maze[hy + dy][hx + dx]) // проверяем, что находится в ячейке матрицы на строку выше
         {
         case 0:                  // если там пусто, то ход возможен.
             HidePlayer();       // вызываем функцию, которая скрывает игрока с экрана и убирает из текущей позиции матрицы
-            hy--;               // уменьшаем координату y
+            hy += dy;               // уменьшаем координату y
+            hx += dx;
             ShowPlayer();       // отображаем игрока в новой позиции
             break;
         case 2:                 // если там дверь выхода
             HidePlayer();       // по аналогии с вышестоящим кодом перемещаем игрока в новую позицию
-            hy--;
+            hy += dy;               // уменьшаем координату y
+            hx += dx;
             ShowPlayer();
             UpdateScore(score += 500);  // добавляем 500 бонусов за достижение выхода из лабиринта
             gameState = 1;              // изменяем статус игры на ВЫИГРЫШ
             break;
         case 4:                 // если там монета
             HidePlayer();       // по аналогии с вышестоящим кодом перемещаем игрока в новую позицию
-            hy--;
+            hy += dy;               // уменьшаем координату y
+            hx += dx;
             ShowPlayer();
             UpdateScore(score += 100); // добавляем 100 бонусов за сбор монеты
-            break;
-        }
-    }
-
-}
-
-// Функция перемещает игрока вниз на одну клетку, если это разрешено
-void GoDown()
-{
-    if (hy < LY - 1)
-    {
-        switch (maze[hy + 1][hx])
-        {
-        case 0:
-            HidePlayer();
-            hy++;
-            ShowPlayer();
-            break;
-        case 2:
-            HidePlayer();
-            hy++;
-            ShowPlayer();
-            UpdateScore(score += 500);
-            gameState = 1;
-            break;
-        case 4:
-            HidePlayer();
-            hy++;
-            ShowPlayer();
-            UpdateScore(score += 100);
-            break;
-        }
-    }
-}
-
-// Функция перемещает игрока вправо на одну клетку, если это разрешено
-void GoRight()
-{
-    if (hx < LX - 1)
-    {
-        switch (maze[hy][hx + 1])
-        {
-        case 0:
-            HidePlayer();
-            hx++;
-            ShowPlayer();
-            break;
-        case 2:
-            HidePlayer();
-            hx++;
-            ShowPlayer();
-            UpdateScore(score += 500);
-            gameState = 1;
-            break;
-        case 4:
-            HidePlayer();
-            hx++;
-            ShowPlayer();
-            UpdateScore(score += 100);
-            break;
-        }
-    }
-}
-
-//// Функция перемещает игрока влево на одну клетку, если это разрешено
-void GoLeft()
-{
-    if (hx > 0)
-    {
-        switch (maze[hy][hx - 1])
-        {
-        case 0:
-            HidePlayer();
-            hx--;
-            ShowPlayer();
-            break;
-        case 2:
-            HidePlayer();
-            hx--;
-            ShowPlayer();
-            UpdateScore(score += 500);
-            gameState = 1;
-            break;
-        case 4:
-            HidePlayer();
-            hx--;
-            ShowPlayer();
-            UpdateScore(score += 100);
             break;
         }
     }
@@ -334,16 +248,16 @@ void Control()
                 switch (_getch()) // то считываем еще один символ (некоторые клавиши выдают двойные коды)
                 {
                 case 72:          // если 2-й символ код 72, то это клавиша курсор вверх
-                    GoUp();       // идем вверх
+                    MovePlayer(0,-1);       // идем вверх
                     break;
                 case 80:          // если 2-й символ код 80, то это клавиша курсор вниз
-                    GoDown();   // идем вниз
+                    MovePlayer(0,1);   // идем вниз
                     break;
                 case 75:        // если 2-й символ код 75, то это клавиша курсор влево
-                    GoLeft();   // идем влево
+                    MovePlayer(-1,0);   // идем влево
                     break;
                 case 77:
-                    GoRight();  // если 2 - й символ код 77, то это клавиша курсор вправо
+                    MovePlayer(1,0);  // если 2 - й символ код 77, то это клавиша курсор вправо
                     break;      // идем вправо
                 }
         }
@@ -365,6 +279,6 @@ int main()
         Control();
         ShowCursor();
     }
-    else endGame();
+    else errorGame();
 }
 
