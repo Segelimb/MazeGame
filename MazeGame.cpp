@@ -12,6 +12,15 @@ using namespace crt;
 
 const int LX = 75;
 const int LY = 30;
+const int PLAYERCOL = COLOR_WHITE;
+const int STANDARTCOL = COLOR_WHITE;
+const int WALLCOL = COLOR_LIGHT_RED;
+const int SCORECOL = COLOR_LIGHT_CYAN;
+const int TIMECOL = COLOR_LIGHT_GREEN;
+const int FEWTIMECOL = COLOR_LIGHT_RED;
+const int EXITCOL = COLOR_GRAY;
+const int MONEYCOL = COLOR_YELLOW;
+
 
 const char player = (char)1;
 // 0 - пустое пространство
@@ -57,7 +66,7 @@ int hx, hy; // позиция игрока в лабиринте
 int score = 0; // счет игры
 
 int gameState = 0; // 0 - игра продолжается, 1 - выигрыш, 2 - закончилось время
-int timeLimit = 210;// лимит игры в секундах
+int timeLimit = 280;// лимит игры в секундах
 int gameTime; // оставшееся время
 
 clock_t tstart; // значение счетчика таймера при старте игры
@@ -67,11 +76,11 @@ void UpdateScore(int score)
 {
     GotoXY(35, 30); // ставим курсор на последнюю строку консоли
     setlocale(LC_ALL, "ru-RU"); // включаем локаль, ориентированную на кириллицу
-    SetTextColor(COLOR_WHITE);
+    SetTextColor(STANDARTCOL);
     cout << "СЧЕТ: ";
-    SetTextColor(COLOR_LIGHT_CYAN);
+    SetTextColor(SCORECOL);
     cout << score;  // выводим счет на экран
-    SetTextColor(COLOR_WHITE);
+    SetTextColor(STANDARTCOL);
     setlocale(LC_ALL, "C"); // возвращаем настройки локали по умолчанию
 }
 
@@ -93,12 +102,13 @@ void UpdateClock(clock_t t)
     else
     {  // если время осталось
         GotoXY(49, 30); // ставим курсор на последнюю строку
+        SetTextColor(STANDARTCOL);
         cout << "Осталось: ";
         if (gameTime > 15)
-            SetTextColor(COLOR_LIGHT_GREEN);
-        else SetTextColor(COLOR_LIGHT_RED);
+            SetTextColor(TIMECOL);
+        else SetTextColor(FEWTIMECOL);
         cout << gameTime;
-        SetTextColor(COLOR_WHITE);
+        SetTextColor(STANDARTCOL);
         cout << " секунд "; // выводим остаток времени в консоль
     }
     setlocale(LC_ALL, "C"); // восстанавливаем настройки локали
@@ -117,19 +127,19 @@ void PrintMaze(int maze[LY][LX], int sizeX, int sizeY)
                 cout << ' ';
                 break;
             case 1:
-                SetTextColor(COLOR_LIGHT_RED);
+                SetTextColor(WALLCOL);
                 cout << (char)178;
                 break;
             case 2:
-                SetTextColor(COLOR_GRAY);
+                SetTextColor(EXITCOL);
                 cout << (char)176;
                 break;
             case 3:
-                SetTextColor(COLOR_WHITE);
+                SetTextColor(PLAYERCOL);
                 cout << player;
                 break;
             case 4:
-                SetTextColor(COLOR_YELLOW);
+                SetTextColor(MONEYCOL);
                 cout << '$';
                 break;
             default:
@@ -176,11 +186,11 @@ bool FindFirstPlayerPosition(int maze[LY][LX], int sizeX, int sizeY)
                 }
             }
         }
-        return true;
+        return false;
     }
     else
     {
-        return false;
+        return true;
     }   // если ничего не нашли - предполагаем, что игрок в позиции 0,0
 }                   // это нелогично, но пока ничего предпринимать не будем, решение
                     // этой проблемы будет вашим персональным заданием по рефакторингу игры
@@ -273,7 +283,7 @@ int main()
     system("mode con cols=80 lines=31");
     system("cls");
     error = FindFirstPlayerPosition(maze, LX, LY);
-    if (error == true)
+    if (error == false)
     {
         PrintMaze(maze, LX, LY);
         HideCursor();
