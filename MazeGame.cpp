@@ -70,7 +70,7 @@ int hx, hy; // позиция игрока в лабиринте
 int score = 0; // счет игры
 
 int gameState = 0; // 0 - игра продолжается, 1 - выигрыш, 2 - закончилось время
-int timeLimit = 3;// лимит игры в секундах
+int timeLimit = 280;// лимит игры в секундах
 int gameTime; // оставшееся время
 
 clock_t tstart; // значение счетчика таймера при старте игры
@@ -122,6 +122,20 @@ void FrameMessage(int type, char message[], int lenght,  int setColor)
     yMessage = ((31 - heightFrame) / 2) + 1;
     GotoXY(xMessage, yMessage);
     cout << message;
+    if (type == SCORETYPE)
+    {
+        int lenghtScore = 1;
+        int sc = score;
+        while (sc != 0)
+        {
+            sc /= 10;
+            lenghtScore++;
+        }
+        xMessage = ((80 - (10 + lenghtScore)) / 2);
+        yMessage = yMessage + 1;
+        GotoXY(xMessage, yMessage);
+        cout << "Ваш счет: " << score;
+    }
     SetTextColor(STANDARTCOL);
     setlocale(LC_ALL, "C");
     GotoXY(0,30);
