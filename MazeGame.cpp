@@ -20,7 +20,11 @@ const int TIMECOL = COLOR_LIGHT_GREEN;
 const int FEWTIMECOL = COLOR_LIGHT_RED;
 const int EXITCOL = COLOR_GRAY;
 const int MONEYCOL = COLOR_YELLOW;
-
+const int ERRORCOL = COLOR_LIGHT_RED;
+const int WINCOL = COLOR_LIGHT_GREEN;
+const int LOSECOL = COLOR_LIGHT_CYAN;
+const int ORDINARYTYPE = 0;
+const int SCORETYPE = 1;
 
 const char player = (char)1;
 // 0 - пустое пространство
@@ -66,11 +70,62 @@ int hx, hy; // позиция игрока в лабиринте
 int score = 0; // счет игры
 
 int gameState = 0; // 0 - игра продолжается, 1 - выигрыш, 2 - закончилось время
-int timeLimit = 280;// лимит игры в секундах
+int timeLimit = 3;// лимит игры в секундах
 int gameTime; // оставшееся время
 
 clock_t tstart; // значение счетчика таймера при старте игры
 
+void FrameMessage(int type, char message[], int lenght,  int setColor)
+{
+    setlocale(LC_ALL, "ru-RU");
+    int widthFrame = lenght + 2;
+    int heightFrame = 0;
+    if (type == SCORETYPE) heightFrame = 4;
+    else heightFrame = 3;
+    int xMessage = (80 - widthFrame) / 2;
+    int yMessage = (31 - heightFrame) / 2;
+    GotoXY(xMessage, yMessage);
+    SetTextColor(setColor);
+    if (widthFrame > 0 || heightFrame > 0)
+    {
+        for (int ElemH = 1; ElemH <= widthFrame; ElemH++)
+        {
+            if (ElemH == 1 || ElemH == heightFrame)
+            {
+                for (int ElemW = 1; ElemW <= widthFrame; ElemW++)
+                {
+                    if (ElemW == 1 || ElemW == widthFrame) cout << "+";
+                    else if (ElemW < widthFrame) cout << "-";
+                    if (ElemW == widthFrame)
+                    {
+                        yMessage++;
+                        GotoXY(xMessage, yMessage);
+                    }
+                }
+            }
+            else if (ElemH < heightFrame)
+            {
+                for (int ElemW = 1; ElemW <= widthFrame; ElemW++)
+                {
+                    if (ElemW == 1 || ElemW == widthFrame) cout << "|";
+                    else if (ElemW < widthFrame) cout << " ";
+                    if (ElemW == widthFrame)
+                    {
+                        yMessage++;
+                        GotoXY(xMessage, yMessage);
+                    }
+                }
+            }
+        }
+    }
+    xMessage = ((80 - widthFrame) / 2) + 1;
+    yMessage = ((31 - heightFrame) / 2) + 1;
+    GotoXY(xMessage, yMessage);
+    cout << message;
+    SetTextColor(STANDARTCOL);
+    setlocale(LC_ALL, "C");
+    GotoXY(0,30);
+}
 // Функция обновляет текущий счет на экране
 void UpdateScore(int score)
 {
@@ -149,14 +204,6 @@ void PrintMaze(int maze[LY][LX], int sizeX, int sizeY)
         cout << endl;
     }
 }
-
-
-void errorGame()
-{
-    setlocale(LC_ALL, "ru-RU");
-    cout << "Игра завершается в связи с инвалидностью лабиринта" << endl;
-}
-
 
 // Функция определяет позицию игрока в массиве, обновляя значения глобальных переменных hx и hy
 bool FindFirstPlayerPosition(int maze[LY][LX], int sizeX, int sizeY)
@@ -274,6 +321,17 @@ void Control()
         }
         Sleep(200);             // останавливаем игру на 200 мсек, если этого не делать, то
     }                           // обновление игры будет слишком быстрым, мы не сможем управлять
+    if (gameState == 1)
+    {
+        char message[39] = "Поздравляем, вы выбрались из лабиринта";
+        FrameMessage(SCORETYPE, message, 38, WINCOL);
+    }
+    else if (gameState == 2)
+    {
+
+        char message[50] = "Вы не успели выбраться из лабиринта, вы проиграли";
+        FrameMessage(SCORETYPE, message, 49, LOSECOL);
+    }
 }                               // игроком, а также напрасно нагрузим процессор ненужной работой
 
 // Функция main, которая выполняется при запуске прграммы
@@ -290,6 +348,10 @@ int main()
         Control();
         ShowCursor();
     }
-    else errorGame();
+    else
+    {
+        char message[51] = "Игра завершается в связи с инвалидностью лабиринта";
+        FrameMessage(ORDINARYTYPE, message, 50, ERRORCOL);
+    }
 }
 
