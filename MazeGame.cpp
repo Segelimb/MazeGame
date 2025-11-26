@@ -146,7 +146,7 @@ void FrameMessage(int type, const char message[], int lenght,  int setColor)
 // Функция обновляет текущий счет на экране
 void UpdateScore(int score)
 {
-    GotoXY(35, 30); // ставим курсор на последнюю строку консоли
+    GotoXY(35, 32); // ставим курсор на последнюю строку консоли
     setlocale(LC_ALL, "ru-RU"); // включаем локаль, ориентированную на кириллицу
     SetTextColor(STANDARTCOL);
     cout << "СЧЕТ: ";
@@ -174,7 +174,7 @@ void UpdateClock(clock_t t, clock_t start, int& gState, int& gTime)
     }
     else
     {  // если время осталось
-        GotoXY(49, 30); // ставим курсор на последнюю строку
+        GotoXY(49, 32); // ставим курсор на последнюю строку
         SetTextColor(STANDARTCOL);
         cout << "Осталось: ";
         if (gameTime > 15)
@@ -190,8 +190,35 @@ void UpdateClock(clock_t t, clock_t start, int& gState, int& gTime)
 // Функция печатает в консоли лабиринт
 void PrintMaze(int maze[LY][LX], int sizeX, int sizeY)
 {
+    int widthFrame = 92;
+    int heightFrame = 32;
+    for (int ElemH = 1; ElemH <= widthFrame; ElemH++)
+    {
+        if (ElemH == 1 || ElemH == heightFrame)
+        {
+            for (int ElemW = 1; ElemW <= widthFrame; ElemW++)
+            {
+                if (ElemW == 1 && ElemH == 1) cout << char(201);
+                else if (ElemW == widthFrame && ElemH == 1) cout << char(187);
+                else if (ElemW == 1 && ElemH == heightFrame) cout << char(200);
+                else if (ElemW == widthFrame && ElemH == heightFrame) cout << char(188);
+                else if (ElemW < widthFrame) cout << char(205);
+            }
+        }
+        else if (ElemH < heightFrame)
+        {
+            for (int ElemW = 1; ElemW <= widthFrame; ElemW++)
+            {
+                if (ElemW == 1 || ElemW == widthFrame) cout << char(186);
+                else if (ElemW < widthFrame) cout << " ";
+            }
+        }
+    }
+    GotoXY(92/2 - 2, 0);
+    cout << "MAZE";
     for (int i = 0; i < sizeY; i++)
     {
+        GotoXY(8, i + 1);
         for (int j = 0; j < sizeX; j++)
         {
             switch (maze[i][j])
@@ -280,7 +307,7 @@ bool FindFirstPlayerPosition(int maze[LY][LX], int sizeX, int sizeY, int& hx, in
 void HidePlayer()
 {
     maze[hy][hx] = 0; // записываем в текущую позицию матрицы число 0
-    GotoXY(hx, hy); // устанавливаем курсор в позицию игрока в консоль
+    GotoXY(hx + 8, hy + 1); // устанавливаем курсор в позицию игрока в консоль
     cout << ' ';    // и печатаем пробел
 }
 
@@ -288,7 +315,7 @@ void HidePlayer()
 void ShowPlayer()
 {
     maze[hy][hx] = 3; // записываем в текущую позицию матрицы число 0
-    GotoXY(hx, hy); // устанавливаем курсор в позицию игрока в консоль
+    GotoXY(hx + 8, hy + 1); // устанавливаем курсор в позицию игрока в консоль
     cout << player; // и печатаем образ игрока
 }
 
@@ -400,7 +427,7 @@ void Control(int& gameState)
 int main()
 {
     bool error;
-    system("mode con cols=80 lines=31");
+    system("mode con cols=92 lines=33");
     system("cls");
     error = FindFirstPlayerPosition(maze, LX, LY, hx, hy);
     if (error == false)
